@@ -4,26 +4,35 @@ def check_args():
     if len(sys.argv) > 2:
         sys.exit("Error: More than one arguments was passed")
     x = sys.argv[1]
+    #x = '1+1'
     i=0
     number = ""
+    is_number = True
+    #print(len(x))
     while i < len(x):
         if x[i].isnumeric():
-            number = x[i]
-        if i+1 == len(x):
-            var = int(x[i])
-            #faz operação
-            if operator =='+':
-                y = int(number) + var
+            temp = ''
+            while x[i].isnumeric():
+                
+                temp +=x[i]
+                #print(temp)
+                if i+1 == len(x):
+                    break
+                
+                i+=1
+            if number == "" and i+1 != len(x):
+                number = int(temp)
             else:
-                y = int(number) - var
-
-
+                var = int(temp)
+                if operator =='+':
+                    y = number + var
+                else:
+                    y = number - var
+                i+=1
         else:
-            operator = x[i]        
+            operator = x[i]  
+            i+=1
         
-        
-        
-        i+=1
     print(y)
 
             
