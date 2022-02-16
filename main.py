@@ -26,6 +26,8 @@ def check_args():
                 number = int(temp)
             else:
                 var = int(temp)
+                if operator !='+' and operator !='-':
+                    sys.exit("Error: Invalid operator")
                 if operator =='+':
                     if y!= None:
                         y += var
