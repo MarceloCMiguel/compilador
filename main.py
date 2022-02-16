@@ -7,7 +7,7 @@ def check_args():
     #x = '1+1-2'
     i=0
     number = ""
-    is_number = True
+    is_number = False
     y= None
     #print(len(x))
     while i < len(x):
@@ -22,6 +22,7 @@ def check_args():
                 
                 i+=1
             if number == "" and i+1 != len(x):
+                is_number = True
                 number = int(temp)
             else:
                 var = int(temp)
@@ -40,7 +41,11 @@ def check_args():
         else:
             operator = x[i]  
             i+=1
-        
+    if y == None:
+        sys.exit("Error: no result")
+
+    # if number != "" and var != None:
+    #     sys.exit("Error: no Operator was detected")
     print(y)
 
             
