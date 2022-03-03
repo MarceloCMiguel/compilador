@@ -22,7 +22,10 @@ class Parser:
                     else:
                         sys.exit(f"Error: the token in position {Parser.tokens.position} must be a number")
                 Parser.tokens.selectNext()
+            if Parser.tokens.actual.type !="EOF":
+                sys.exit("Error: the compiler didn't finish the code")
             print(resultado)
+            return resultado
 
 
 

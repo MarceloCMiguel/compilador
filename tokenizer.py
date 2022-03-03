@@ -39,6 +39,12 @@ class Tokenizer:
                     return self.actual
             self.actual = Token('NUMBER',int(temp))
             return self.actual
-
+        # caso de espaços
         else:
-            pass
+            while self.origin[self.position] == " ":
+                self.position += 1
+                if self.position>=len(self.origin):
+                    self.actual = Token('EOF','')
+                    return self.actual
+            return self.selectNext()
+
