@@ -40,7 +40,6 @@ class Parser:
             if Parser.tokens.actual.type == "MINUS":
                 Parser.tokens.selectNext()
                 resultado -= Parser.parseTerm()
-            Parser.tokens.selectNext()
         if Parser.tokens.actual.type !="EOF":
             sys.exit("Error: the compiler didn't finish the code")
         print(resultado)
