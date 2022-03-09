@@ -6,12 +6,13 @@ class Tokenizer:
         self.position = 0
         self.actual = None
     def selectNext(self):
-        # se for +
+        
 
         if self.position >= len(self.origin):
             self.actual = Token('EOF','')
             return self.actual 
 
+        # se for +
         elif self.origin[self.position] == '+':
             self.actual = Token('PLUS','')
             self.position +=1
@@ -20,6 +21,18 @@ class Tokenizer:
         # se for -
         elif self.origin[self.position] == '-':
             self.actual = Token('MINUS','')
+            self.position +=1
+            return self.actual
+
+        # se for *
+        elif self.origin[self.position] == '*':
+            self.actual = Token('TIMES','')
+            self.position +=1
+            return self.actual
+
+        # se for /
+        elif self.origin[self.position] == '/':
+            self.actual = Token('DIVISION','')
             self.position +=1
             return self.actual
 
