@@ -36,6 +36,18 @@ class Tokenizer:
             self.position +=1
             return self.actual
 
+        # se for (
+        elif self.origin[self.position] == '(':
+            self.actual = Token('OPEN_PAREN','')
+            self.position +=1
+            return self.actual
+
+        # se for )
+        elif self.origin[self.position] == ')':
+            self.actual = Token('CLOSE_PAREN','')
+            self.position +=1
+            return self.actual
+        
         # se for numero
         elif self.origin[self.position].isnumeric():
             #percorre até o origin[position] não ser número
