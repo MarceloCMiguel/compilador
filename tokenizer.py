@@ -6,12 +6,65 @@ class Tokenizer:
         self.position = 0
         self.actual = None
     def selectNext(self):
-        
+        reserved_words = {
+            'printf': 'PRINT'
+        }
 
         if self.position >= len(self.origin):
             self.actual = Token('EOF','')
             return self.actual 
 
+        elif self.origin[self.position] == ';':
+            self.actual = Token('SEMICOLON','')
+            self.position +=1
+            return self.actual
+
+        elif self.origin[self.position] == '{':
+            self.actual = Token('OPEN_BRACKETS','')
+            self.position +=1
+            return self.actual
+
+        elif self.origin[self.position] == '}':
+            self.actual = Token('CLOSE_BRACKETS','')
+            self.position +=1
+            return self.actual
+
+        # IDENTIFIER
+
+        elif self.origin[self.position].isalpha():
+            temp = self.origin[self.position]
+            self.position +=1
+            if self.position>=len(self.origin):
+                if temp in reserved_words:
+                    self.actual = Token(reserved_words[temp],temp)
+                    return self.actual
+                self.actual = Token('IDENTIFIER',temp)
+                return self.actual
+            while self.origin[self.position].isalpha() or self.origin[self.position].isnumeric() or self.origin[self.position]=='_':
+                temp += self.origin[self.position]
+                self.position +=1
+                if self.position>=len(self.origin):
+                    if temp in reserved_words:
+                        self.actual = Token(reserved_words[temp],temp)
+                        return self.actual
+                    self.actual = Token('IDENTIFIER',temp)
+                    return self.actual
+            if temp in reserved_words:
+                self.actual = Token(reserved_words[temp],temp)
+                return self.actual
+            self.actual = Token('IDENTIFIER',temp)
+            return self.actual
+
+        #enter
+        elif self.origin[self.position] == '\n':
+            self.position +=1
+            return self.selectNext()
+
+        elif self.origin[self.position] == '=':
+            self.actual = Token('EQUAL','')
+            self.position +=1
+            return self.actual
+            
         # se for +
         elif self.origin[self.position] == '+':
             self.actual = Token('PLUS','')
