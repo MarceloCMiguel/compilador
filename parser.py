@@ -5,10 +5,7 @@ import sys
 class Parser:
     tokens= None
 
-
-
     def parseBlock():
-        
         if Parser.tokens.actual.type == 'OPEN_BRACKETS':
             Parser.tokens.selectNext()
             lista_node = []
@@ -27,7 +24,8 @@ class Parser:
         if Parser.tokens.actual.type == 'SEMICOLON':
             node = NoOp('',[])
             Parser.tokens.selectNext()
-        if Parser.tokens.actual.type == 'IDENTIFIER':
+            return node
+        elif Parser.tokens.actual.type == 'IDENTIFIER':
             node = Identifier(Parser.tokens.actual.value,[])
             Parser.tokens.selectNext()
             if Parser.tokens.actual.type == 'EQUAL':
