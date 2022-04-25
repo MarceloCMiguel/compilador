@@ -25,6 +25,16 @@ class BinOp(Node):
             return self.children[0].Evaluate(st) + self.children[1].Evaluate(st)
         elif self.value == '-':
             return self.children[0].Evaluate(st) - self.children[1].Evaluate(st)
+        elif self.value == '==':
+            return self.children[0].Evaluate(st) == self.children[1].Evaluate(st)
+        elif self.value == '<':
+            return self.children[0].Evaluate(st) < self.children[1].Evaluate(st)    
+        elif self.value == '>':
+            return self.children[0].Evaluate(st) > self.children[1].Evaluate(st)    
+        elif self.value == '||':
+            return self.children[0].Evaluate(st) or self.children[1].Evaluate(st)
+        elif self.value == '&&':
+            return self.children[0].Evaluate(st) and self.children[1].Evaluate(st)
         else:
             sys.exit("Error Valuate")
 
@@ -34,6 +44,8 @@ class UnOp(Node):
             return self.children[0].Evaluate(st)
         elif self.value == '-':
             return - self.children[0].Evaluate(st)
+        elif self.value == '!':
+            return not self.children[0].Evaluate(st)
         sys.exit(f"Error UnOp: {self.value} not supported")
 
 class IntVal(Node):
@@ -65,6 +77,21 @@ class Block(Node):
         for children in self.children:
             children.Evaluate(st)
 
+class While(Node):
+    def Evaluate(self, st):
+        while self.children[0].Evaluate(st):
+            self.children[1].Evaluate(st)
+
+class If(Node):
+    def Evaluate(self, st):
+        if self.children[0].Evaluate(st):
+            self.children[1].Evaluate(st)
+        elif len(self.children)>2:
+            self.children[2].Evaluate(st)
+
+class Scanf(Node):
+    def Evaluate(self, st):
+        int(input())    
 
 # node = IntVal(5,[])
 # node = BinOp('+',[node,node])

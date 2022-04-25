@@ -1,5 +1,5 @@
 from token import Token
-
+import sys
 class Tokenizer:
     def __init__(self,origin):
         self.origin = origin
@@ -7,12 +7,45 @@ class Tokenizer:
         self.actual = None
     def selectNext(self):
         reserved_words = {
-            'printf': 'PRINT'
+            'printf': 'PRINT',
+            'if':'IF',
+            'else':'ELSE',
+            'while':'WHILE',
+            '<':'MINOR',
+            '>':'GREATER',
+            '||':'OR',
+            '&&':'AND',
+            'scanf':'SCANF',
+            '!': 'NOT'
         }
 
         if self.position >= len(self.origin):
             self.actual = Token('EOF','')
             return self.actual 
+
+        elif self.origin[self.position] in reserved_words:
+            temp = self.origin[self.position]
+            self.actual = Token(reserved_words[temp],temp)
+            self.position += 1
+            return self.actual
+        
+        elif self.origin[self.position] == '&':
+            self.position +=1
+            if self.origin[self.position] == '&':
+                self.position +=1
+                self.actual = Token(reserved_words['&&'],'&&')
+                return self.actual
+            else:
+                sys.exit(f"ERROR TOKENIZER: Expect a & but receive {self.origin[self.position]}")
+            
+        elif self.origin[self.position] == '||':
+            self.position +=1
+            if self.origin[self.position] == '||':
+                self.position +=1
+                self.actual = Token(reserved_words['||'],'||')
+                return self.actual
+            else:
+                sys.exit(f"ERROR TOKENIZER: Expect a || but receive {self.origin[self.position]}")
 
         elif self.origin[self.position] == ';':
             self.actual = Token('SEMICOLON','')
@@ -63,6 +96,9 @@ class Tokenizer:
         elif self.origin[self.position] == '=':
             self.actual = Token('EQUAL','')
             self.position +=1
+            if self.origin[self.position] == '=':
+                self.actual = Token('EQUAL_TO','')
+                self.position +=1
             return self.actual
             
         # se for +
