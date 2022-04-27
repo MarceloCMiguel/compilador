@@ -61,7 +61,9 @@ class Parser:
                 Parser.tokens.selectNext()
                 node = Parser.relativeExpression()
                 if Parser.tokens.actual.type == "CLOSE_PAREN":
-                    node = While('while',[node,Parser.parseStatement])
+                    Parser.tokens.selectNext()
+                    node = While('while',[node,Parser.parseStatement()])
+                    return node
                 else:
                     sys.exit(f"ERROR STATEMENT: There are open parentheses {Parser.tokens.actual.value}")
             else:
