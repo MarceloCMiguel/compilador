@@ -1,9 +1,7 @@
 {
-    i = 1;
-    n = 5;
-    while ((i < n))
+    x = 1;
+    if ((x == 2) || (x < 2))
     {
-        i = i + 1;
-        printf(i);
+        printf(1);
     }
 }

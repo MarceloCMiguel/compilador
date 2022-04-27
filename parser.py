@@ -17,7 +17,7 @@ class Parser:
             Parser.tokens.selectNext()
             return node
         else:
-            sys.exit("ERROR PARSER BLOCK: Open Brackets not find")
+            sys.exit(f"ERROR PARSER BLOCK: Open Brackets not find, finded {Parser.tokens.actual.type}")
         
 
 

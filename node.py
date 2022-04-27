@@ -91,7 +91,7 @@ class If(Node):
 
 class Scanf(Node):
     def Evaluate(self, st):
-        int(input())    
+        return int(input())    
 
 # node = IntVal(5,[])
 # node = BinOp('+',[node,node])

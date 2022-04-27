@@ -38,9 +38,9 @@ class Tokenizer:
             else:
                 sys.exit(f"ERROR TOKENIZER: Expect a & but receive {self.origin[self.position]}")
             
-        elif self.origin[self.position] == '||':
+        elif self.origin[self.position] == '|':
             self.position +=1
-            if self.origin[self.position] == '||':
+            if self.origin[self.position] == '|':
                 self.position +=1
                 self.actual = Token(reserved_words['||'],'||')
                 return self.actual
