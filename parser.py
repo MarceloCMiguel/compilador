@@ -143,8 +143,6 @@ class Parser:
         return node
 
     def parseFactor():
-        # resultado = 0
-        # node = 0
         if Parser.tokens.actual.type == 'NUMBER':
             # resultado += Parser.tokens.actual.value
             node = IntVal(Parser.tokens.actual.value,[])
@@ -165,6 +163,7 @@ class Parser:
             node = UnOp('!',[Parser.parseFactor()])
 
         elif Parser.tokens.actual.type == "OPEN_PAREN":
+            Parser.tokens.selectNext()
             node = Parser.relativeExpression()
             # resultado = Parser.parseExpression()
             if Parser.tokens.actual.type == "CLOSE_PAREN":
