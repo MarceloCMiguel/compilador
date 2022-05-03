@@ -10,21 +10,33 @@
 
 BLOCK = "{", { STATEMENT }, "}" ;
 
-STATEMENT = ( λ | ASSIGNMENT | PRINT), ";" ;
+STATEMENT = ( λ | ASSIGNMENT | PRINT | BLOCK | WHILE | IF), ";" ;
 
 ASSIGNMENT = IDENTIFIER, "=", EXPRESSION ;
 
 PRINT = "printf", "(", EXPRESSION, ")" ;
 
-EXPRESSION = TERM, { ("+" | "-"), TERM } ;
+RELEXPRESSION = EXPRESSION , {("<" | ">" | "==") , EXPRESSION } ;
 
-TERM = FACTOR, { ("*" | "/"), FACTOR } ;
+EXPRESSION = TERM, { ("+" | "-" | "||"), TERM } ;
 
-FACTOR = (("+" | "-"), FACTOR) | NUMBER | "(", EXPRESSION, ")" | IDENTIFIER ;
+TERM = FACTOR, { ("*" | "/" | "&&"), FACTOR } ;
+
+FACTOR = NUMBER | IDENTIFIER | (("+" | "-" | "!") , FACTOR) | "(" , RELEXPRESSION , ")" | SCANF;
 
 IDENTIFIER = LETTER, { LETTER | DIGIT | "_" } ;
 
-NUMBER = DIGIT, { DIGIT } ;
+WHILE = "while", "(", RELEXPRESSION ,")", STATEMENT;
+
+IF = "if", "(", RELEXPRESSION ,")", STATEMENT, (("else", STATEMENT) | λ );
+
+PRINT = "printf", "(" , EXPRESSION, ")" ;
+
+SCANF = "scanf", "(", ")" ;
+
+IDENTIFIER = LETTER, { LETTER | DIGIT | "_" } ;
+
+NUMBER = DIGIT , { DIGIT } ;
 
 LETTER = ( a | ... | z | A | ... | Z ) ;
 
