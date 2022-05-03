@@ -14,8 +14,6 @@ STATEMENT = ( λ | ASSIGNMENT | PRINT | BLOCK | WHILE | IF), ";" ;
 
 ASSIGNMENT = IDENTIFIER, "=", EXPRESSION ;
 
-PRINT = "printf", "(", EXPRESSION, ")" ;
-
 RELEXPRESSION = EXPRESSION , {("<" | ">" | "==") , EXPRESSION } ;
 
 EXPRESSION = TERM, { ("+" | "-" | "||"), TERM } ;
