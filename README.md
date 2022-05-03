@@ -32,8 +32,6 @@ PRINT = "printf", "(" , EXPRESSION, ")" ;
 
 SCANF = "scanf", "(", ")" ;
 
-IDENTIFIER = LETTER, { LETTER | DIGIT | "_" } ;
-
 NUMBER = DIGIT , { DIGIT } ;
 
 LETTER = ( a | ... | z | A | ... | Z ) ;
