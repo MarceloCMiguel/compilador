@@ -20,9 +20,10 @@ class BinOp(Node):
         (value_child2, type_child2) = self.children[1].Evaluate(st)
         if (type_child1 != type_child2 and self.value != '.'):
             sys.exit("ERROR BINOP EVALUEATE:")
-        if (type_child1 != type_child2 and self.value == '.'):
+        if (self.value == '.'):
             value = str(value_child1) + str(value_child2)
             return (value,"STRING")
+        
         value = 0
         if self.value in ['==','<','>']:
             if self.value == '==':
