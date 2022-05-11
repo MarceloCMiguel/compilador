@@ -1,7 +1,7 @@
 from select import select
 
 from tokenizer import Tokenizer
-from node import BinOp,UnOp,IntVal,NoOp,Assignment,Block,Identifier,Print,While,If,Scanf
+from node import BinOp,UnOp,IntVal,NoOp,Assignment,Block,Identifier,Print,While,If,Scanf, VarDec, StrVal
 import sys
 class Parser:
     tokens= None
@@ -39,6 +39,7 @@ class Parser:
                     sys.exit(f"ERROR STATEMENT: Expected SEMICOLON, readed {Parser.tokens.actual.type} {Parser.tokens.actual.value} ")
             else:
                 sys.exit("ERROR STATEMENT: expected a equal")
+        
         elif Parser.tokens.actual.type == 'PRINT':
             Parser.tokens.selectNext()
             if Parser.tokens.actual.type == 'OPEN_PAREN':
@@ -55,6 +56,30 @@ class Parser:
                 else:
                     sys.exit(f"ERROR STATEMENT: There are open parentheses {Parser.tokens.actual.value}")
             
+        elif Parser.tokens.actual.type in ["STRING","INT"]:
+            type_iden = Parser.tokens.actual.type
+            Parser.tokens.selectNext()
+            lista_tokens = []
+            if Parser.tokens.actual.type == 'IDENTIFIER':
+                token_iden = Parser.tokens.actual
+            else:
+                sys.exit(f"ERROR STATEMENT: Invalid token type {Parser.tokens.actual.type} in type")
+            Parser.tokens.selectNext()
+            lista_tokens.append(token_iden)
+
+            while Parser.tokens.actual.type == "COMMA":
+                Parser.tokens.selectNext()
+                if Parser.tokens.actual.type == 'IDENTIFIER':
+                    token_iden = Parser.tokens.actual
+                else:
+                    sys.exit(f"ERROR STATEMENT: Invalid token type {Parser.tokens.actual.type} in type")
+                lista_tokens.append(token_iden)
+                Parser.tokens.selectNext()
+            if Parser.tokens.actual.type == 'SEMICOLON':
+                Parser.tokens.selectNext()
+                return VarDec(type_iden,lista_tokens)
+            else:
+                sys.exit(f"ERROR STATEMENT TYPE: semicolon expected, finded {Parser.tokens.actual.type}")
         elif Parser.tokens.actual.type == 'WHILE':
             Parser.tokens.selectNext()
             if Parser.tokens.actual.type == 'OPEN_PAREN':
@@ -111,18 +136,21 @@ class Parser:
         # resultado = Parser.parseTerm()
         node = Parser.parseTerm()
         
-        while Parser.tokens.actual.type in ["PLUS","MINUS","OR"]:
+        while Parser.tokens.actual.type in ["PLUS","MINUS","OR","DOT"]:
             if Parser.tokens.actual.type == "PLUS":
                 Parser.tokens.selectNext()
                 # resultado += Parser.parseTerm()
                 node = BinOp('+',[node,Parser.parseTerm()])
-            if Parser.tokens.actual.type == "MINUS":
+            elif Parser.tokens.actual.type == "MINUS":
                 Parser.tokens.selectNext()
                 # resultado -= Parser.parseTerm()
                 node = BinOp('-',[node,Parser.parseTerm()])
-            if Parser.tokens.actual.type == "OR":
+            elif Parser.tokens.actual.type == "OR":
                 Parser.tokens.selectNext()
                 node = BinOp('||',[node,Parser.parseTerm()])
+            elif Parser.tokens.actual.type == "DOT":
+                Parser.tokens.selectNext()
+                node = BinOp('.',[node,Parser.parseTerm()])
         return node    
 
 
@@ -143,11 +171,18 @@ class Parser:
         return node
 
     def parseFactor():
+        
         if Parser.tokens.actual.type == 'NUMBER':
+            
             # resultado += Parser.tokens.actual.value
             node = IntVal(Parser.tokens.actual.value,[])
             Parser.tokens.selectNext()
         
+        elif Parser.tokens.actual.type == 'STRING':
+            node = StrVal(Parser.tokens.actual.value,[])
+            Parser.tokens.selectNext()
+        
+
         elif Parser.tokens.actual.type == "PLUS":
             Parser.tokens.selectNext()
             node = UnOp('+',[Parser.parseFactor()])

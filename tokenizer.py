@@ -16,12 +16,32 @@ class Tokenizer:
             '||':'OR',
             '&&':'AND',
             'scanf':'SCANF',
-            '!': 'NOT'
+            '!': 'NOT',
+            '.':'DOT',
+            ',':"COMMA",
+            'int':'INT',
+            'str':'STRING',
         }
 
         if self.position >= len(self.origin):
             self.actual = Token('EOF','')
             return self.actual 
+
+        elif self.origin[self.position] == '"':
+            #percorre até o origin[position] não ser número
+            self.position +=1
+            temp = self.origin[self.position]
+            self.position +=1
+            if self.position>=len(self.origin):
+                sys.exit("ERROR TOKENIZER: STRING error")
+            while self.origin[self.position]!='"':
+                temp += self.origin[self.position]
+                self.position +=1
+                if self.position>=len(self.origin):
+                    sys.exit("ERROR TOKENIZER: STRING error")
+            self.position+=1
+            self.actual = Token('STRING',temp)
+            return self.actual
 
         elif self.origin[self.position] in reserved_words:
             temp = self.origin[self.position]
