@@ -10,6 +10,8 @@ class SymbolTable():
         sys.exit(f"ERROR SYMBOLTABLE: variable {name} not in dict")
     
     def create(self,name,type_):
+        if name in self.table:
+            sys.exit(f"ERROR SYMBOLTABLE: variable {name} already created")
         if type_ == "STRING" or type_ == "INT":
             self.table[name] = (None,type_)
         else:
