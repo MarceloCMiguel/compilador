@@ -39,7 +39,7 @@ class BinOp(Node):
                 else:
                     value = 0    
             elif self.value == '>':
-                bool_value = value_child1 < value_child2
+                bool_value = value_child1 > value_child2
                 if bool_value == True:
                     value = 1
                 else:
