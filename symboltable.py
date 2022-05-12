@@ -33,5 +33,3 @@ class SymbolTable():
                 sys.exit(f"ERROR SYMBOLTABLE INT: setter value {value} invalid for type {type_in_dict}")
         else:
             sys.exit(f"ERROR SYMBOLTABLE: setter variable {name} error")
-
-

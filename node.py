@@ -19,7 +19,9 @@ class BinOp(Node):
         (value_child1, type_child1) = self.children[0].Evaluate(st)
         (value_child2, type_child2) = self.children[1].Evaluate(st)
         if (type_child1 != type_child2 and self.value != '.'):
-            sys.exit("ERROR BINOP EVALUEATE:")
+            print((value_child1, type_child1))
+            print((value_child2, type_child2))
+            sys.exit("ERROR BINOP EVALUATE:")
         if (self.value == '.'):
             value = str(value_child1) + str(value_child2)
             return (value,"STRING")
@@ -49,7 +51,6 @@ class BinOp(Node):
         elif type_child1 == "INT":
             if self.value == '*':
                 value = value_child1 * value_child2
-                return (value,value_child1)
             elif self.value == '/':
                 value = value_child1 // value_child2
 
@@ -141,7 +142,8 @@ class If(Node):
 
 class Scanf(Node):
     def Evaluate(self, st):
-        return int(input())
+        var = int(input())
+        return (var,"INT")
 
  
 
