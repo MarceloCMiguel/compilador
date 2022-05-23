@@ -1,0 +1,11 @@
+PUSH DWORD 0 ;
+PUSH DWORD 0 ;
+MOV EBX 10 ; EVALUATE DO INTVAL
+MOV [EBP-4], EBX; resultado da atribuição
+MOV EBX, [EBP-4]
+PUSH EBX ;
+MOV EBX 5 ; EVALUATE DO INTVAL
+POP EAX ;
+SUB EAX, EBX ;
+MOV EBX, EAX
+MOV [EBP-8], EBX; resultado da atribuição
