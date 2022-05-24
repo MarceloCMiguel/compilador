@@ -84,48 +84,26 @@ _start:
   ; codigo gerado pelo compilador 
 
 PUSH DWORD 0 ;
-PUSH DWORD 0 ;
-PUSH DWORD 0 ;
-MOV EBX, 5 ; EVALUATE DO INTVAL
-MOV [EBP-8], EBX ; resultado da atribuição
 MOV EBX, 2 ; EVALUATE DO INTVAL
 MOV [EBP-4], EBX ; resultado da atribuição
-MOV EBX, 1 ; EVALUATE DO INTVAL
-MOV [EBP-12], EBX ; resultado da atribuição
-LOOP_1: ;
+IF_1:
 MOV EBX, [EBP-4] ;
 PUSH EBX ;
-MOV EBX, [EBP-8] ;
-PUSH EBX ;
 MOV EBX, 1 ; EVALUATE DO INTVAL
-POP EAX ;
-ADD EAX, EBX ;
-MOV EBX, EAX ;
 POP EAX ;
 CMP EAX, EBX ;
-CALL binop_jl ;
+CALL binop_je ;
 CMP EBX, False ;
-JE EXIT_34 ;
-MOV EBX, [EBP-12] ;
-PUSH EBX ;
+JE ELSE_1
 MOV EBX, [EBP-4] ;
-POP EAX ;
-IMUL EBX ;
-MOV EBX, EAX ;
-MOV [EBP-12], EBX ; resultado da atribuição
-MOV EBX, [EBP-4] ;
-PUSH EBX ;
-MOV EBX, 1 ; EVALUATE DO INTVAL
-POP EAX ;
-ADD EAX, EBX ;
-MOV EBX, EAX ;
-MOV [EBP-4], EBX ; resultado da atribuição
-JMP LOOP_34 ; volta para testar de novo
-EXIT_34:
-MOV EBX, [EBP-12] ;
 PUSH EBX ; Empilhe os argumentos
 CALL print ; Chamada da função
 POP EBX ; Desempilhe os argumentos
+JMP EXIT_1
+ELSE_1:
+MOV EBX, 2 ; EVALUATE DO INTVAL
+MOV [EBP-4], EBX ; resultado da atribuição
+EXIT_1:
 ; interrupcao por saida
 POP EBP
 MOV EAX, 1

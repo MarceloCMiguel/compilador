@@ -47,6 +47,13 @@ class BinOp(Node):
         elif self.value == '<':
             asm.write("CMP EAX, EBX ;")
             asm.write("CALL binop_jl ;")
+        elif self.value == '>':
+            asm.write("CMP EAX, EBX ;")
+            asm.write("CALL binop_jg ;")
+        elif self.value == '==':
+            asm.write("CMP EAX, EBX ;")
+            asm.write("CALL binop_je ;")
+
         
         return (value, 'INT','-1')
         # if (self.value == '.'):
@@ -124,8 +131,6 @@ class StrVal(Node):
 class IntVal(Node):
     
     def Evaluate(self,st, asm):
-        
-        
         assembly = f"MOV EBX, {self.value} ; EVALUATE DO INTVAL"
         asm.write(assembly)
         return (self.value, "INT","-1")
@@ -162,7 +167,8 @@ class Assignment(Node):
 
 class Print(Node):
     def Evaluate(self, st, asm):
-        print(self.children[0].Evaluate(st,asm)[0])
+        self.children[0].Evaluate(st,asm)
+        # print(self.children[0].Evaluate(st,asm)[0])
         asm.write("PUSH EBX ; Empilhe os argumentos")
         asm.write("CALL print ; Chamada da função")
         asm.write("POP EBX ; Desempilhe os argumentos")
@@ -175,22 +181,38 @@ class Block(Node):
 
 class While(Node):
     def Evaluate(self, st,asm):
-        asm.write(f"LOOP_{Node.newId()}: ;")
+        id_while = Node.newId()
+        asm.write(f"LOOP_{id_while}: ;")
         self.children[0].Evaluate(st,asm)
         asm.write("CMP EBX, False ;")
-        asm.write("JE EXIT_34 ;")
+        asm.write(f"JE EXIT_{id_while} ;")
         self.children[1].Evaluate(st, asm)
-        asm.write("JMP LOOP_34 ; volta para testar de novo")
-        asm.write("EXIT_34:")
+        asm.write(f"JMP LOOP_{id_while} ; volta para testar de novo")
+        asm.write(f"EXIT_{id_while}:")
         # while self.children[0].Evaluate(st,asm)[0]:
         #     self.children[1].Evaluate(st, asm)
 
 class If(Node):
     def Evaluate(self, st, asm):
-        if self.children[0].Evaluate(st, asm)[0]:
-            self.children[1].Evaluate(st, asm)
-        elif len(self.children)>2:
-            self.children[2].Evaluate(st, asm)
+        id_if = Node.newId()
+        asm.write(f"IF_{id_if}:")
+        self.children[0].Evaluate(st,asm)
+        asm.write("CMP EBX, False ;")
+        if len(self.children)>2:
+            asm.write(f"JE ELSE_{id_if}")
+        else:
+            asm.write(f"JE EXIT_{id_if}")
+        self.children[1].Evaluate(st,asm)
+        asm.write(f"JMP EXIT_{id_if}")
+        if len(self.children)>2:
+            asm.write(f"ELSE_{id_if}:")
+            self.children[2].Evaluate(st,asm)
+        asm.write(f"EXIT_{id_if}:")
+        # if self.children
+        # if self.children[0].Evaluate(st, asm)[0]:
+        #     self.children[1].Evaluate(st, asm)
+        # elif len(self.children)>2:
+        #     self.children[2].Evaluate(st, asm)
 
 class Scanf(Node):
     def Evaluate(self, st, asm):
