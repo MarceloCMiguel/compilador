@@ -89,7 +89,7 @@ MOV [EBP-4], EBX ; resultado da atribuição
 IF_1:
 MOV EBX, [EBP-4] ;
 PUSH EBX ;
-MOV EBX, 1 ; EVALUATE DO INTVAL
+MOV EBX, 2 ; EVALUATE DO INTVAL
 POP EAX ;
 CMP EAX, EBX ;
 CALL binop_je ;
@@ -107,4 +107,4 @@ EXIT_1:
 ; interrupcao por saida
 POP EBP
 MOV EAX, 1
-INT 0 x80
+INT 0x80

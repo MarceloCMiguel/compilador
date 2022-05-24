@@ -93,6 +93,6 @@ _start:
 		self.write("; interrupcao por saida")
 		self.write("POP EBP")
 		self.write("MOV EAX, 1")
-		self.write("INT 0 x80")
+		self.write("INT 0x80")
 		with open(self.code_name,'w+') as f:
 			f.write(self.code)
