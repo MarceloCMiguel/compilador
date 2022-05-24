@@ -1,5 +1,5 @@
 
-        ; constantes
+; constantes
 SYS_EXIT equ 1
 SYS_READ equ 3
 SYS_WRITE equ 4
@@ -85,12 +85,48 @@ _start:
 
 PUSH DWORD 0 ;
 PUSH DWORD 0 ;
-MOV EBX 10 ; EVALUATE DO INTVAL
-MOV [EBP-4], EBX; resultado da atribuição
-MOV EBX, [EBP-4]
+PUSH DWORD 0 ;
+MOV EBX, 5 ; EVALUATE DO INTVAL
+MOV [EBP-8], EBX ; resultado da atribuição
+MOV EBX, 2 ; EVALUATE DO INTVAL
+MOV [EBP-4], EBX ; resultado da atribuição
+MOV EBX, 1 ; EVALUATE DO INTVAL
+MOV [EBP-12], EBX ; resultado da atribuição
+LOOP_1: ;
+MOV EBX, [EBP-4] ;
 PUSH EBX ;
-MOV EBX 5 ; EVALUATE DO INTVAL
+MOV EBX, [EBP-8] ;
+PUSH EBX ;
+MOV EBX, 1 ; EVALUATE DO INTVAL
 POP EAX ;
-SUB EAX, EBX ;
-MOV EBX, EAX
-MOV [EBP-8], EBX; resultado da atribuição
+ADD EAX, EBX ;
+MOV EBX, EAX ;
+POP EAX ;
+CMP EAX, EBX ;
+CALL binop_jl ;
+CMP EBX, False ;
+JE EXIT_34 ;
+MOV EBX, [EBP-12] ;
+PUSH EBX ;
+MOV EBX, [EBP-4] ;
+POP EAX ;
+IMUL EBX ;
+MOV EBX, EAX ;
+MOV [EBP-12], EBX ; resultado da atribuição
+MOV EBX, [EBP-4] ;
+PUSH EBX ;
+MOV EBX, 1 ; EVALUATE DO INTVAL
+POP EAX ;
+ADD EAX, EBX ;
+MOV EBX, EAX ;
+MOV [EBP-4], EBX ; resultado da atribuição
+JMP LOOP_34 ; volta para testar de novo
+EXIT_34:
+MOV EBX, [EBP-12] ;
+PUSH EBX ; Empilhe os argumentos
+CALL print ; Chamada da função
+POP EBX ; Desempilhe os argumentos
+; interrupcao por saida
+POP EBP
+MOV EAX, 1
+INT 0 x80

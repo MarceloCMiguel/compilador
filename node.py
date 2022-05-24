@@ -1,9 +1,11 @@
 import sys
 from symboltable import SymbolTable
 from asm import Asm
+
+
 class Node():
     #constructor
-
+    i = 0
     def __init__(self, value, children):
         self.value = value
         self.children = children
@@ -11,11 +13,16 @@ class Node():
     def Evaluate(self,st: SymbolTable, asm: Asm):
         pass
 
+    def newId():
+        Node.i +=1
+        return Node.i
+
 
 class BinOp(Node):
     def __init__(self,value,children):
         super().__init__(value,children)
     def Evaluate(self,st, asm):
+        
         (value_child1, type_child1, id_child1) =self.children[0].Evaluate(st,asm)
         asm.write("PUSH EBX ;")
         (value_child2, type_child2, id_child2) =self.children[1].Evaluate(st,asm)
@@ -23,17 +30,24 @@ class BinOp(Node):
         value = 0
         if self.value == '+':
             asm.write("ADD EAX, EBX ;")
+            asm.write("MOV EBX, EAX ;")
             value = value_child1 + value_child2
         elif self.value == '-':
             asm.write("SUB EAX, EBX ;")
+            asm.write("MOV EBX, EAX ;")
             value = value_child1 - value_child2
         elif self.value == '*':
-            asm.write("IMUL EAX, EBX ;")
+            asm.write("IMUL EBX ;")
+            asm.write("MOV EBX, EAX ;")
             value = value_child1 * value_child2
         elif self.value == '/':
-            asm.write("IDIV EAX, EBX ;")
+            asm.write("IDIV EBX ;")
+            asm.write("MOV EBX, EAX ;")
             value = value_child1 // value_child2
-        asm.write("MOV EBX, EAX")
+        elif self.value == '<':
+            asm.write("CMP EAX, EBX ;")
+            asm.write("CALL binop_jl ;")
+        
         return (value, 'INT','-1')
         # if (self.value == '.'):
         #     value = str(value_child1) + str(value_child2)
@@ -91,7 +105,7 @@ class BinOp(Node):
 
 class UnOp(Node):
     def Evaluate(self,st, asm):
-        print(self.children[0].Evaluate(st, asm))
+        
         (value_child, type_child) = self.children[0].Evaluate(st, asm)
         if type_child == "STRING":
             sys.exit(f"ERROR EVALUATE UNOP: STRING type don't support this operation")
@@ -110,7 +124,9 @@ class StrVal(Node):
 class IntVal(Node):
     
     def Evaluate(self,st, asm):
-        assembly = f"MOV EBX {self.value} ; EVALUATE DO INTVAL"
+        
+        
+        assembly = f"MOV EBX, {self.value} ; EVALUATE DO INTVAL"
         asm.write(assembly)
         return (self.value, "INT","-1")
 
@@ -128,23 +144,29 @@ class NoOp(Node):
 
 class Identifier(Node):
     def Evaluate(self,st, asm):
+        
         (value, type_, id) = st.getter(self.value)
-        asm.write(f"MOV EBX, [EBP-{id}]")
+        asm.write(f"MOV EBX, [EBP-{id}] ;")
         return (value, type_, id)
 
 class Assignment(Node):
     def Evaluate(self, st, asm):
+        
         variable_name = self.children[0].value
         value = self.children[1].Evaluate(st, asm)
         st.setter(variable_name,value[0])
         (variable_value,type_,id) =st.getter(variable_name)
-        asm.write(f"MOV [EBP-{id}], EBX; resultado da atribuição")
+        asm.write(f"MOV [EBP-{id}], EBX ; resultado da atribuição")
 
 
 
 class Print(Node):
     def Evaluate(self, st, asm):
         print(self.children[0].Evaluate(st,asm)[0])
+        asm.write("PUSH EBX ; Empilhe os argumentos")
+        asm.write("CALL print ; Chamada da função")
+        asm.write("POP EBX ; Desempilhe os argumentos")
+        
 
 class Block(Node):
     def Evaluate(self, st, asm):
@@ -153,8 +175,15 @@ class Block(Node):
 
 class While(Node):
     def Evaluate(self, st,asm):
-        while self.children[0].Evaluate(st,asm)[0]:
-            self.children[1].Evaluate(st, asm)
+        asm.write(f"LOOP_{Node.newId()}: ;")
+        self.children[0].Evaluate(st,asm)
+        asm.write("CMP EBX, False ;")
+        asm.write("JE EXIT_34 ;")
+        self.children[1].Evaluate(st, asm)
+        asm.write("JMP LOOP_34 ; volta para testar de novo")
+        asm.write("EXIT_34:")
+        # while self.children[0].Evaluate(st,asm)[0]:
+        #     self.children[1].Evaluate(st, asm)
 
 class If(Node):
     def Evaluate(self, st, asm):

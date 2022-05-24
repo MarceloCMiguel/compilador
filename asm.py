@@ -1,6 +1,6 @@
 class Asm:
-    def __init__(self, code_name) -> None:
-        self.code = """
+	def __init__(self, code_name) -> None:
+		self.code = """
 ; constantes
 SYS_EXIT equ 1
 SYS_READ equ 3
@@ -85,10 +85,14 @@ _start:
 
   ; codigo gerado pelo compilador \n
 """
-        self.code_name = code_name
-
-    def write(self,code):
-        self.code+= code + '\n'
-    def dump(self):
-        with open(self.code_name,'w+') as f:
-            f.write(self.code)
+		self.code_name = code_name
+	
+	def write(self,code):
+		self.code+= code + '\n'
+	def dump(self):
+		self.write("; interrupcao por saida")
+		self.write("POP EBP")
+		self.write("MOV EAX, 1")
+		self.write("INT 0 x80")
+		with open(self.code_name,'w+') as f:
+			f.write(self.code)
