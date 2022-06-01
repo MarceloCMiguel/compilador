@@ -21,6 +21,8 @@ class Tokenizer:
             ',':"COMMA",
             'int':'INT',
             'str':'STRING',
+            'return':"RETURN",
+            'void':"VOID",
         }
 
         if self.position >= len(self.origin):

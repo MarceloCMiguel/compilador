@@ -1,6 +1,7 @@
+from platform import node
 import sys
 from symboltable import SymbolTable
-
+from functable import FuncTable
 class Node():
     #constructor
 
@@ -19,8 +20,6 @@ class BinOp(Node):
         (value_child1, type_child1) = self.children[0].Evaluate(st)
         (value_child2, type_child2) = self.children[1].Evaluate(st)
         if (type_child1 != type_child2 and self.value != '.'):
-            print((value_child1, type_child1))
-            print((value_child2, type_child2))
             sys.exit("ERROR BINOP EVALUATE:")
         if (self.value == '.'):
             value = str(value_child1) + str(value_child2)
@@ -126,7 +125,10 @@ class Print(Node):
 class Block(Node):
     def Evaluate(self, st):
         for children in self.children:
-            children.Evaluate(st)
+            if children.value == 'return':
+                return children.Evaluate(st)
+            else:
+                children.Evaluate(st)
 
 class While(Node):
     def Evaluate(self, st):
@@ -144,6 +146,36 @@ class Scanf(Node):
     def Evaluate(self, st):
         var = int(input())
         return (var,"INT")
+    
+class FuncDec(Node):
+    def Evaluate(self, st):
+        FuncTable.create(self.value,self)
+
+class FuncCall(Node):
+    def Evaluate(self, st):
+        func_dec = FuncTable.getter(self.value)
+        st_ = SymbolTable()
+        list_childrens = func_dec.children
+        if len(list_childrens)-2 != len(self.children):
+            sys.exit(f"ERROR FUNCCALL: wrong number os childrens passed in function {self.value},\
+                 expected {len(list_childrens)-2}, received {len(self.children)} ")
+        vars_name = []
+        for children_func_dec in list_childrens[1:-1]:
+            #cria variáveis na st
+            children_func_dec.Evaluate(st_)
+            vars_name.append(children_func_dec.value)
+        i = 0
+        for children_func_call in self.children:
+            #atribui valores as variáveis criadas na st
+            st_.setter(vars_name[i],children_func_call.Evaluate(st_))
+            i+=1
+        block_func_dec = list_childrens[-1]
+        return block_func_dec.Evaluate(st_)
+        # Falta checkar return
+
+class Return(Node):
+    def Evaluate(self, st):
+        return self.children[0].Evaluate(st)
 
  
 

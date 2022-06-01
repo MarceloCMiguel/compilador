@@ -1,13 +1,88 @@
-from select import select
-
 from tokenizer import Tokenizer
-from node import BinOp,UnOp,IntVal,NoOp,Assignment,Block,Identifier,Print,While,If,Scanf, VarDec, StrVal
+from node import *
 import sys
 class Parser:
     tokens= None
 
+
+    def parseProgram():
+        list_defs = []
+        while Parser.tokens.actual.type != 'EOF':
+            list_defs.append(Parser.parseDeclaration())
+        return Block('Block',list_defs)
+    
+    def parseDeclaration():
+        if Parser.tokens.actual.type in ["STRING","INT","VOID"]:
+            
+            type_func = Parser.tokens.actual.type
+            Parser.tokens.selectNext()
+            if Parser.tokens.actual.type == "IDENTIFIER":
+                
+                iden_func = Parser.tokens.actual
+                name_func = VarDec(type_func,[iden_func])
+                list_childrens = []
+                list_childrens.append(name_func)
+                
+                Parser.tokens.selectNext()
+                if Parser.tokens.actual.type == "OPEN_PAREN":
+                    
+                    Parser.tokens.selectNext()
+                    if Parser.tokens.actual.type == "CLOSE_PAREN":
+                        
+                        Parser.tokens.selectNext()
+                        list_childrens.append(Parser.parseBlock())
+                        return FuncDec(iden_func.value,list_childrens)
+                    elif Parser.tokens.actual.type in ["STRING","INT","VOID"]:
+                        
+                        type_arg = Parser.tokens.actual.type
+                        Parser.tokens.selectNext()
+                        if Parser.tokens.actual.type == "IDENTIFIER":
+                            
+                            iden_arg = Parser.tokens.actual
+                            Parser.tokens.selectNext()
+                            arg_func = VarDec(type_arg,[iden_arg])
+                            list_childrens.append(arg_func)
+                            while Parser.tokens.actual.type == "COMMA":
+                                
+                                Parser.tokens.selectNext()
+                                if Parser.tokens.actual.type in ["STRING","INT","VOID"]:
+                                    
+                                    type_arg = Parser.tokens.actual.type
+                                    Parser.tokens.selectNext()
+                                    if Parser.tokens.actual.type == "IDENTIFIER":
+                                        
+                                        iden_arg = Parser.tokens.actual
+                                        Parser.tokens.selectNext()
+                                        arg_func = VarDec(type_arg,[iden_arg])
+                                        list_childrens.append(arg_func)
+                                        
+                                    else:
+                                        sys.exit(f"ERROR PARSEDECLARATION: expect a second IDENTIFIER, received {Parser.tokens.actual.type}")    
+                                else:
+                                    sys.exit(f"ERROR PARSEDECLARATION: expect STRING or INT or VOID, received {Parser.tokens.actual.type}")
+                            if Parser.tokens.actual.type == "CLOSE_PAREN":
+                                Parser.tokens.selectNext()
+                                
+                                list_childrens.append(Parser.parseBlock())
+                                return FuncDec(iden_func.value,list_childrens)
+                                    
+
+                        else:
+                            sys.exit(f"ERROR PARSEDECLARATION: expect a second IDENTIFIER, received {Parser.tokens.actual.type}")    
+                    else:
+                        sys.exit(f"ERROR PARSEDECLARATION: expect a Close Paren or a type of identifier, received {Parser.tokens.actual.type}")    
+
+                else:
+                    sys.exit(f"ERROR PARSEDECLARATION: expect a OPEN_PAREN, received {Parser.tokens.actual.type}")    
+            else:
+                sys.exit(f"ERROR PARSEDECLARATION: expect a IDENTIFIER, received {Parser.tokens.actual.type}")
+
+        else:
+            sys.exit(f"ERROR PARSEDECLARATION: expect STRING or INT or VOID, received {Parser.tokens.actual.type}")
+
     def parseBlock():
         if Parser.tokens.actual.type == 'OPEN_BRACKETS':
+            
             Parser.tokens.selectNext()
             lista_node = []
             while Parser.tokens.actual.type !='CLOSE_BRACKETS':
@@ -26,7 +101,9 @@ class Parser:
             node = NoOp('',[])
             Parser.tokens.selectNext()
             return node
+        
         elif Parser.tokens.actual.type == 'IDENTIFIER':
+            name_function = Parser.tokens.actual.value #if function
             node = Identifier(Parser.tokens.actual.value,[])
             Parser.tokens.selectNext()
             if Parser.tokens.actual.type == 'EQUAL':
@@ -36,9 +113,29 @@ class Parser:
                     Parser.tokens.selectNext()
                     return node
                 else:
-                    sys.exit(f"ERROR STATEMENT: Expected SEMICOLON, readed {Parser.tokens.actual.type} {Parser.tokens.actual.value} ")
+                    sys.exit(f"ERROR STATEMENT IDENTIFIER: Expected SEMICOLON, readed {Parser.tokens.actual.type} {Parser.tokens.actual.value} ")
+            elif Parser.tokens.actual.type == "OPEN_PAREN":
+                list_childrens = []
+                Parser.tokens.selectNext()
+                if Parser.tokens.actual.type == "CLOSE_PAREN":
+                    Parser.tokens.selectNext()
+                    if Parser.tokens.actual.type == 'SEMICOLON':
+                        Parser.tokens.selectNext()
+                        return FuncCall(name_function,[])
+                else:
+                    list_childrens.append(Parser.relativeExpression())
+                    while Parser.tokens.actual.type == "COMMA":
+                        Parser.tokens.selectNext()
+                        list_childrens.append(Parser.relativeExpression())
+                    if Parser.tokens.actual.type == "CLOSE_PAREN":
+                        Parser.tokens.selectNext()
+                        if Parser.tokens.actual.type == 'SEMICOLON':
+                            Parser.tokens.selectNext()
+                            return FuncCall(name_function,list_childrens)
+                    else:
+                        sys.exit(f"ERROR STATEMENT: expect a CLOSE_PAREN, receive {Parser.tokens.actual.type}")
             else:
-                sys.exit("ERROR STATEMENT: expected a equal")
+                sys.exit(f"ERROR STATEMENT IDENTIFIER: expected a equal or open paren, receive {Parser.tokens.actual.type}")
         
         elif Parser.tokens.actual.type == 'PRINT':
             Parser.tokens.selectNext()
@@ -80,6 +177,25 @@ class Parser:
                 return VarDec(type_iden,lista_tokens)
             else:
                 sys.exit(f"ERROR STATEMENT TYPE: semicolon expected, finded {Parser.tokens.actual.type}")
+        
+        elif Parser.tokens.actual.type == 'RETURN':
+            Parser.tokens.selectNext()
+            if Parser.tokens.actual.type == "OPEN_PAREN":
+                Parser.tokens.selectNext()
+                node = Return('return',[Parser.relativeExpression()])
+                if Parser.tokens.actual.type == "CLOSE_PAREN":
+                    Parser.tokens.selectNext()
+                    if Parser.tokens.actual.type == 'SEMICOLON':
+                        Parser.tokens.selectNext()
+                        return node
+                    else:
+                        sys.exit(f"ERROR STATEMENT RETURN: Expected SEMICOLON, readed {Parser.tokens.actual.type} {Parser.tokens.actual.value} ")
+                else:
+                    sys.exit(f"ERROR STATEMENT RETURN: There are open parentheses {Parser.tokens.actual.value}")
+            else:
+                sys.exit(f"ERROR STATEMENT RETURN: Expected open parentheses {Parser.tokens.actual.value}")
+                        
+        
         elif Parser.tokens.actual.type == 'WHILE':
             Parser.tokens.selectNext()
             if Parser.tokens.actual.type == 'OPEN_PAREN':
@@ -221,7 +337,26 @@ class Parser:
 
         elif Parser.tokens.actual.type == "IDENTIFIER":
             node = Identifier(Parser.tokens.actual.value, [])
+            name_function = Parser.tokens.actual.value #if function
             Parser.tokens.selectNext()
+            if Parser.tokens.actual.type == "OPEN_PAREN":
+                list_childrens = []
+                Parser.tokens.selectNext()
+                if Parser.tokens.actual.type == "CLOSE_PAREN":
+                    Parser.tokens.selectNext()
+                    if Parser.tokens.actual.type == 'SEMICOLON':
+                        Parser.tokens.selectNext()
+                        node = FuncCall(name_function,[])
+                else:
+                    list_childrens.append(Parser.relativeExpression())
+                    while Parser.tokens.actual.type == "COMMA":
+                        Parser.tokens.selectNext()
+                        list_childrens.append(Parser.relativeExpression())
+                    if Parser.tokens.actual.type == "CLOSE_PAREN":
+                        Parser.tokens.selectNext()
+                        node = FuncCall(name_function,list_childrens) 
+                    else:
+                        sys.exit(f"ERROR FACTOR: expect a CLOSE_PAREN, receive {Parser.tokens.actual.type}")
         else:
             sys.exit("ERROR: The code must start with a number, or '+','-','('")
         return node
@@ -231,7 +366,8 @@ class Parser:
     def run(code):
         Parser.tokens = Tokenizer(code)
         Parser.tokens.selectNext()
-        node = Parser.parseBlock()
+        node = Parser.parseProgram()
         if Parser.tokens.actual.type !="EOF":
             sys.exit("Error: the compiler didn't finish the code")
+        node.children.append(FuncCall('main',[]))
         return node
