@@ -7,6 +7,7 @@ class SymbolTable():
     def getter(self,name):
         if name in self.table:
             return self.table[name]
+        
         sys.exit(f"ERROR SYMBOLTABLE: variable {name} not in dict")
     
     def create(self,name,type_):

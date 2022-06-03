@@ -163,11 +163,11 @@ class FuncCall(Node):
         for children_func_dec in list_childrens[1:-1]:
             #cria variáveis na st
             children_func_dec.Evaluate(st_)
-            vars_name.append(children_func_dec.value)
+            vars_name.append(children_func_dec.children[0].value)
         i = 0
         for children_func_call in self.children:
             #atribui valores as variáveis criadas na st
-            st_.setter(vars_name[i],children_func_call.Evaluate(st_))
+            st_.setter(vars_name[i],children_func_call.Evaluate(st)[0])
             i+=1
         block_func_dec = list_childrens[-1]
         return block_func_dec.Evaluate(st_)
